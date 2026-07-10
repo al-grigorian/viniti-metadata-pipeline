@@ -1,0 +1,35 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# --- Инструменты разработки ---
+.idea/
+.vscode/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- Секреты и окружение ---
+.env
+
+# --- Данные (13 855 PDF в git не place) ---
+data/**
+!data/**/
+!data/**/.gitkeep
+
+# --- Модели и кэши LLM ---
+models/
+*.gguf
+
+# --- macOS ---
+.DS_Store
