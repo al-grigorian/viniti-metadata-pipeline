@@ -1,4 +1,7 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+import re
+
+DOI_RE = re.compile(r"\b10\.\d{4,9}/[-._;()/:A-Za-z0-9<>]+")
 
 class Author(BaseModel):
     """Автор публикации в том виде, в каком он указан на первой странице PDF"""
@@ -32,3 +35,25 @@ class ArticleMetadata(BaseModel):
         default=None,
         description="Диапазон страниц статьи в издании, например «12–19»"
     )
+    
+    @field_validator("doi", mode="before")
+    @classmethod
+    def normalize_doi(cls, value: object) -> str | None:
+        """Приводит DOI к канонической форме: без URL-префикса, в нижнем регистре
+
+        Отклоняет строки, не содержащие DOI, - ошибка валидации
+        возвращается Instructor'у как сигнал для повторного запроса к LLM.
+        """
+
+        if value is None:
+            return None
+        text = str(value).strip()
+        if not text:
+            return None # пустую строку трактуем как отсутствие DOI
+        match = DOI_RE.search(text)
+        if match is None:
+            raise ValueError(f"Строка не содержит корректного DOI: {text!r}")
+        return match.group(0).rstrip(".,;:").lower()
+
+
+
